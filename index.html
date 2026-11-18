@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#15171B">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Daily</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#15171B;--surface:#1D2025;--surface2:#252932;--border:#31353E;--text:#EDEDEF;--muted:#8A8F98;--amber:#E8A33D;--amberdim:#4A3A20;--sage:#6FA287;--sagedim:#233029;--brick:#C0574B;--brickdim:#3A211F;--blue:#6E9BC4}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:15px}
+body{padding-bottom:60px}
+.wrap{max-width:640px;margin:0 auto;padding:18px 16px}
+h1{font-family:Oswald,sans-serif;font-weight:600;font-size:26px;margin:0}
+.label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:24px 0 10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.btn{font:inherit;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer}
+.big{width:100%;padding:15px;font-size:15px;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.big.on{background:var(--sagedim);border-color:var(--sage);color:var(--sage)}
+.check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:transparent;flex:0 0 auto}
+.big.on .check{background:var(--sage);border-color:var(--sage);color:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:13px;padding:9px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer}
+.chip.on{background:var(--amberdim);border-color:var(--amber);color:var(--amber)}
+.row{padding:12px 0;border-bottom:1px solid var(--surface2)}
+.row:last-child{border-bottom:0;padding-bottom:0}
+.row:first-child{padding-top:0}
+.rowtitle{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:8px}
+.num{font-family:Oswald,sans-serif;font-size:30px}
+.num span{font-size:14px;color:var(--muted);font-family:Inter,sans-serif}
+.bar{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin:10px 0}
+.fill{height:100%;background:linear-gradient(90deg,#B97A2C,var(--amber));transition:width .25s}
+.water .fill{background:linear-gradient(90deg,#3E6D92,var(--blue))}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+.btnrow .btn{flex:1;min-width:60px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
+.next{font-size:15px;margin-bottom:12px}
+.warn{background:var(--brickdim);color:var(--brick);border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:12px;line-height:1.4}
+.resetbtn{font-size:11px;color:var(--brick);border-color:var(--brick);font-family:'JetBrains Mono',monospace;text-transform:uppercase;white-space:nowrap}
+select{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-family:'JetBrains Mono',monospace;font-size:13px;margin-bottom:10px}
+.timeline{border-left:2px solid var(--border);padding-left:16px;margin-left:6px}
+.blk{position:relative;padding-bottom:13px}
+.blk::before{content:'';position:absolute;left:-21px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--border)}
+.blk .t{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.blk .l{font-size:14px;margin-top:2px}
+.blk .n{font-size:12px;color:var(--muted);margin-top:2px}
+.dows{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:5px}
+.dow{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-align:center}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cell{aspect-ratio:1;border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.cell.done{background:var(--sagedim);border-color:var(--sage);color:var(--sage);font-size:14px}
+.cell.today{border-color:var(--amber);color:var(--text)}
+.cell.future{border-style:dashed;opacity:.35}
+.foot{text-align:center;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;margin-top:28px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1 id="dayTitle">-</h1>
+      <div class="sub" id="dateLine">-</div>
+    </div>
+    <button class="btn resetbtn" data-act="reset" id="resetBtn">reset day</button>
+  </div>
+
+  <div class="label">Minimum · every day, even the worst one</div>
+  <div class="card" id="minCard"></div>
+
+  <div class="label">Checklist · one per row</div>
+  <div class="card" id="checklist"></div>
+  <div class="note">McGill Big 3 is in the minimum above, so it is not repeated here.</div>
+
+  <div class="label" id="protLbl">Protein</div>
+  <div class="card" id="protein"></div>
+
+  <div class="label">Water</div>
+  <div class="card water" id="water"></div>
+
+  <div id="sitBlock" style="display:none">
+    <div class="label">Sit break · workdays</div>
+    <div class="card" id="sitCard"></div>
+  </div>
+
+  <div class="label">Knee routine · tentative</div>
+  <div class="card" id="knee"></div>
+
+  <div class="label">Last 4 weeks · ✓ = minimum done</div>
+  <div class="card" id="cal"></div>
+
+  <div class="label">Schedule preview</div>
+  <select id="daySelect"></select>
+  <div class="card"><div class="timeline" id="timeline"></div></div>
+
+  <div class="foot">Tracking always logs to today. The dropdown only previews the schedule.<br>
+  Data is saved in this browser only. Use the same browser every time.</div>
+</div>
+
+<script>
+// ---- Settings: change numbers here, not in the logic ----
+const S = {
+  protein: 150,
+  proteinSteps: [20, 35, 45, 50],
+  waterGoal: 3000,          // ml. Default; change if your doctor or you decide otherwise
+  waterSteps: [250, 500],
+  sitMin: 45                // minutes between sit breaks
+};
+
+// ---- Days ----
+const DAYS = [
+  {name:'Sunday',    kind:'appointment', tag:'Appointment · dinner 7–10 pm',     plan:'sun'},
+  {name:'Monday',    kind:'workday',     tag:'No appointment',                   plan:'evening'},
+  {name:'Tuesday',   kind:'workday',     tag:'No appointment',                   plan:'evening'},
+  {name:'Wednesday', kind:'workday',     tag:'No appointment',                   plan:'evening'},
+  {name:'Thursday',  kind:'appointment', tag:'Appointment · dinner 7 pm–12 am',  plan:'thu'},
+  {name:'Friday',    kind:'rest',        tag:'Off · chores + rest',              plan:'rest'},
+  {name:'Saturday',  kind:'prep',        tag:'Off · grocery + prep',             plan:'prep'}
+];
+
+const PLANS = {
+  sun: [
+    ['07:00','Wake, no snooze'],
+    ['07:15','Breathing or meditation'],
+    ['07:25','McGill Big 3 (minimum)'],
+    ['07:35','Training, optional · 2 min minimum'],
+    ['08:25','Shower + breakfast','~35 g protein'],
+    ['09:00','Commute to work'],
+    ['10:00','Work','lunch ~45 g · snack ~20 g'],
+    ['18:00','Leave for appointment','45 min drive'],
+    ['19:00','Appointment = dinner','aim ~50 g protein'],
+    ['22:00','Drive home','30 min'],
+    ['22:30','Wind down'],
+    ['23:00','Sleep']
+  ],
+  thu: [
+    ['07:00','Wake, no snooze'],
+    ['07:15','Breathing or meditation'],
+    ['07:25','McGill Big 3 (minimum)'],
+    ['07:35','Training, optional · 2 min minimum'],
+    ['08:25','Shower + breakfast','~35 g protein'],
+    ['09:00','Commute to work'],
+    ['10:00','Work','lunch ~45 g · snack ~20 g'],
+    ['18:00','Leave for appointment','30 min drive'],
+    ['19:00','Appointment = dinner','aim ~50 g protein'],
+    ['24:00','Drive home','45 min'],
+    ['00:45','Sleep']
+  ],
+  evening: [
+    ['07:00','Wake, no snooze'],
+    ['07:15','Breathing or meditation'],
+    ['07:25','McGill Big 3 (minimum)'],
+    ['07:35','Training, optional · 2 min minimum'],
+    ['08:25','Shower + breakfast','~35 g protein'],
+    ['09:00','Commute to work'],
+    ['10:00','Work','lunch ~45 g · snack ~20 g'],
+    ['18:00','Commute home'],
+    ['19:00','Dinner','~50 g protein'],
+    ['19:30','Neck · forearms · eyes'],
+    ['20:30','Journal · reading · mental organization','one, your choice'],
+    ['21:30','Sleep']
+  ],
+  rest: [
+    ['07:00','Wake · optional light training or full rest'],
+    ['08:00','House chores'],
+    ['12:00','Genuine rest'],
+    ['18:00','Catch up anything missed this week']
+  ],
+  prep: [
+    ['07:00','Wake, breakfast'],
+    ['10:00','Grocery run','2 hr slot'],
+    ['12:00','Lunch'],
+    ['13:00','Batch cook + portion','cook and portion the week ahead'],
+    ['15:00','Free · optional training']
+  ]
+};
+
+// ---- Checklist rows (single pick per row) ----
+const ROWS = [
+  {id:'calm',  title:'Meditation / Wim Hof',        opts:['Meditation 10 min','Wim Hof']},
+  {id:'disc',  title:'Disc care extras',            opts:['Cobra + planks','Mobility / yoga']},
+  {id:'train', title:'Training',                    opts:['Upper','Lower','Cardio']},
+  {id:'maint', title:'Neck · forearms · eyes',      opts:['Neck + forearms','Rope 10 min + shrugs','Eyes + spar']},
+  {id:'mind',  title:'Mind',                        opts:['Journal','Reading','Mental organization']}
+];
+
+const KNEE = [
+  'Wall sit · 3 × 30 s (stop at knee pain)',
+  'Glute bridge · 2 × 10',
+  'Quad hold, leg straight · 3 × 5 s each leg',
+  'Hip flexor stretch · 30 s each side'
+];
+
+// ---- Storage (never throws) ----
+function safeGet(key, fallback){
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function safeSet(key, val){
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){}
+}
+
+// ---- Dates (local time, not UTC) ----
+function dayKey(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function addDays(d, n){
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+}
+
+const today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+const TODAYKEY = dayKey(today);
+let viewIdx = today.getDay();
+
+function emptyDay(){
+  return { mcgill:false, gym:false, cats:{}, protein:0, water:0, knee:[false,false,false,false] };
+}
+function getDay(key){
+  const saved = safeGet('day:' + key, {});
+  const d = emptyDay();
+  return Object.assign(d, saved, { cats: Object.assign({}, saved.cats || {}) });
+}
+function saveDay(key, obj){ safeSet('day:' + key, obj); }
+function isMinDone(d){ return !!(d.mcgill && d.gym); }
+
+// ---- Sit break (timestamp-based, survives reopening) ----
+function sitRemainingMs(){
+  let last = safeGet('sitbreak', null);
+  if(!last){ last = Date.now(); safeSet('sitbreak', last); }
+  return last + S.sitMin * 60000 - Date.now();
+}
+function fmtTime(ms){
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2,'0');
+}
+function tickSit(){
+  const el = document.getElementById('sitTime');
+  if(!el) return;
+  const ms = sitRemainingMs();
+  if(ms <= 0){
+    el.textContent = 'Break now';
+    el.style.color = 'var(--brick)';
+  } else {
+    el.textContent = fmtTime(ms) + ' to next break';
+    el.style.color = 'var(--text)';
+  }
+}
+
+// ---- Renderers ----
+function renderHeader(){
+  const info = DAYS[today.getDay()];
+  document.getElementById('dayTitle').textContent = info.name;
+  document.getElementById('dateLine').textContent =
+    today.toLocaleDateString('en-GB', {day:'numeric', month:'short'}) + ' · ' + info.tag;
+}
+
+function renderMin(d){
+  let next;
+  if(!d.mcgill) next = 'Next: McGill Big 3';
+  else if(!d.gym) next = 'Next: 2 min in the gym';
+  else next = 'Minimum done. Everything below is bonus.';
+
+  let warn = '';
+  const yKey = dayKey(addDays(today, -1));
+  const yUsed = safeGet('day:' + yKey, null) !== null;
+  if(yUsed && !isMinDone(getDay(yKey))){
+    warn = '<div class="warn">Yesterday was missed. Minimum only today. No catch-up.</div>';
+  }
+
+  return warn +
+    '<div class="next">' + next + '</div>' +
+    '<button class="btn big ' + (d.mcgill ? 'on' : '') + '" data-act="min" data-val="mcgill">' +
+      '<span>McGill Big 3 · about 5 min</span><span class="check">✓</span></button>' +
+    '<div style="height:8px"></div>' +
+    '<button class="btn big ' + (d.gym ? 'on' : '') + '" data-act="min" data-val="gym">' +
+      '<span>2 min in the gym · any movement</span><span class="check">✓</span></button>';
+}
+
+function renderChecklist(d){
+  return ROWS.map(function(r){
+    return '<div class="row"><div class="rowtitle">' + r.title + '</div><div class="chips">' +
+      r.opts.map(function(o){
+        const on = d.cats[r.id] === o ? 'on' : '';
+        return '<button class="chip ' + on + '" data-act="cat" data-row="' + r.id + '" data-opt="' + o + '">' + o + '</button>';
+      }).join('') +
+      '</div></div>';
+  }).join('');
+}
+
+function renderProtein(d){
+  const pct = Math.min(100, d.protein / S.protein * 100);
+  return '<div class="num">' + d.protein + '<span> / ' + S.protein + ' g</span></div>' +
+    '<div class="bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
+    '<div class="btnrow">' +
+      S.proteinSteps.map(function(n){ return '<button class="btn" data-act="prot" data-val="' + n + '">+' + n + '</button>'; }).join('') +
+      '<button class="btn" data-act="protReset" style="color:var(--muted)">reset</button>' +
+    '</div>';
+}
+
+function renderWater(d){
+  const pct = Math.min(100, d.water / S.waterGoal * 100);
+  return '<div class="num">' + d.water + '<span> / ' + S.waterGoal + ' ml</span></div>' +
+    '<div class="bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
+    '<div class="btnrow">' +
+      S.waterSteps.map(function(n){ return '<button class="btn" data-act="water" data-val="' + n + '">+' + n + '</button>'; }).join('') +
+      '<button class="btn" data-act="waterReset" style="color:var(--muted)">reset</button>' +
+    '</div>';
+}
+
+function renderSit(){
+  return '<div class="num" id="sitTime">-</div>' +
+    '<div class="note">Stand and walk 2 min, then tap. No pop-up appears. Use a phone alarm if you want one.</div>' +
+    '<div class="btnrow" style="margin-top:10px"><button class="btn" data-act="stand" style="flex:1">I stood up</button></div>';
+}
+
+function renderKnee(d){
+  return KNEE.map(function(t, i){
+    return '<button class="btn big ' + (d.knee[i] ? 'on' : '') + '" data-act="knee" data-val="' + i + '" style="margin-bottom:' + (i < KNEE.length-1 ? '8' : '0') + 'px">' +
+      '<span>' + t + '</span><span class="check">✓</span></button>';
+  }).join('') +
+  '<div class="note">Tentative. If a knee swells, locks or gives way, get it checked before continuing.</div>';
+}
+
+function renderCal(){
+  const dows = ['S','M','T','W','T','F','S'].map(function(x){ return '<div class="dow">' + x + '</div>'; }).join('');
+  const start = addDays(today, -today.getDay() - 21); // Sunday three weeks back
+  let cells = '';
+  for(let i = 0; i < 28; i++){
+    const dt = addDays(start, i);
+    const k = dayKey(dt);
+    const future = dt > today;
+    const done = !future && isMinDone(getDay(k));
+    const cls = ['cell', done ? 'done' : '', (k === TODAYKEY) ? 'today' : '', future ? 'future' : ''].join(' ');
+    cells += '<div class="' + cls + '">' + (done ? '✓' : (future ? '' : dt.getDate())) + '</div>';
+  }
+  return '<div class="dows">' + dows + '</div><div class="grid">' + cells + '</div>';
+}
+
+function renderSchedule(){
+  const info = DAYS[viewIdx];
+  document.getElementById('timeline').innerHTML = PLANS[info.plan].map(function(b){
+    return '<div class="blk"><div class="t">' + b[0] + '</div><div class="l">' + b[1] + '</div>' +
+      (b[2] ? '<div class="n">' + b[2] + '</div>' : '') + '</div>';
+  }).join('');
+}
+
+function render(){
+  const d = getDay(TODAYKEY);
+  renderHeader();
+  document.getElementById('minCard').innerHTML = renderMin(d);
+  document.getElementById('checklist').innerHTML = renderChecklist(d);
+  document.getElementById('protein').innerHTML = renderProtein(d);
+  document.getElementById('water').innerHTML = renderWater(d);
+
+  const workday = today.getDay() >= 0 && today.getDay() <= 4;
+  document.getElementById('sitBlock').style.display = workday ? 'block' : 'none';
+  if(workday) document.getElementById('sitCard').innerHTML = renderSit();
+
+  document.getElementById('knee').innerHTML = renderKnee(d);
+  document.getElementById('cal').innerHTML = renderCal();
+  renderSchedule();
+  tickSit();
+}
+
+// ---- Actions (event delegation) ----
+document.addEventListener('click', function(e){
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  const act = el.dataset.act;
+
+  if(act === 'reset'){
+    if(!el.dataset.armed){
+      el.dataset.armed = '1';
+      el.textContent = 'tap to confirm';
+      setTimeout(function(){ el.dataset.armed = ''; el.textContent = 'reset day'; }, 3000);
+      return;
+    }
+    el.dataset.armed = '';
+    el.textContent = 'reset day';
+    saveDay(TODAYKEY, emptyDay());
+    render();
+    return;
+  }
+
+  if(act === 'stand'){
+    safeSet('sitbreak', Date.now());
+    render();
+    return;
+  }
+
+  const d = getDay(TODAYKEY);
+  if(act === 'min'){ const k = el.dataset.val; d[k] = !d[k]; }
+  else if(act === 'cat'){
+    const r = el.dataset.row, o = el.dataset.opt;
+    d.cats[r] = (d.cats[r] === o) ? null : o;
+  }
+  else if(act === 'prot'){ d.protein += Number(el.dataset.val); }
+  else if(act === 'protReset'){ d.protein = 0; }
+  else if(act === 'water'){ d.water += Number(el.dataset.val); }
+  else if(act === 'waterReset'){ d.water = 0; }
+  else if(act === 'knee'){ const i = Number(el.dataset.val); d.knee[i] = !d.knee[i]; }
+  else return;
+
+  saveDay(TODAYKEY, d);
+  render();
+});
+
+// ---- Schedule preview dropdown (preview only) ----
+document.getElementById('daySelect').addEventListener('change', function(e){
+  viewIdx = Number(e.target.value);
+  renderSchedule();
+});
+
+// ---- Init ----
+(function init(){
+  const sel = document.getElementById('daySelect');
+  sel.innerHTML = DAYS.map(function(d, i){
+    return '<option value="' + i + '">' + d.name + ' · ' + d.tag + '</option>';
+  }).join('');
+  sel.value = String(viewIdx);
+  document.getElementById('protLbl').textContent = 'Protein · ' + S.protein + ' g target';
+  render();
+  setInterval(tickSit, 1000);
+  // Reload at midnight so "today" always means today
+  setInterval(function(){
+    const now = new Date();
+    if(dayKey(now) !== TODAYKEY) location.reload();
+  }, 60000);
+})();
+</script>
+</body>
+</html>
